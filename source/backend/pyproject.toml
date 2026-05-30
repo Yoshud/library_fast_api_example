@@ -1,0 +1,11 @@
+[project]
+name = "momentum-interview"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.18.4",
+    "fastapi[standard]>=0.136.3",
+    "sqlalchemy[asyncio]>=2.0.50",
+]
