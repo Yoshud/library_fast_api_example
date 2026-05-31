@@ -8,4 +8,12 @@ dependencies = [
     "alembic>=1.18.4",
     "fastapi[standard]>=0.136.3",
     "sqlalchemy[asyncio]>=2.0.50",
+    "asyncpg>=0.29.0",
+    "pydantic-settings>=2.2.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.3.0",
 ]
