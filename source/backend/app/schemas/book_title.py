@@ -1,17 +1,17 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class BookInfoCreateScheme(BaseModel):
+class BookTitleCreateScheme(BaseModel):
     title: str
     author: str
 
 
-class BookInfoUpdateScheme(BaseModel):
+class BookTitleUpdateScheme(BaseModel):
     title: str|None = None
     author: str|None = None
 
 
-class BookInfoResponseScheme(BaseModel):
+class BookTitleResponseScheme(BaseModel):
     id: int
     title: str
     author: str

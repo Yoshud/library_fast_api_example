@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.models.base import serial_number
+
 
 class UserCreateScheme(BaseModel):
     name: str
@@ -10,7 +12,7 @@ class UserUpdateScheme(BaseModel):
 
 
 class UserResponseScheme(BaseModel):
-    id: str
+    id: serial_number
     name: str
 
     # load data from database using "."
