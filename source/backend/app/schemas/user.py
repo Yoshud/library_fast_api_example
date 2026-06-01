@@ -1,19 +1,19 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.models.base import serial_number
+from app.utils.types import serial_number, name_literal
 
 
 class UserCreateScheme(BaseModel):
-    name: str
+    name: name_literal
 
 
 class UserUpdateScheme(BaseModel):
-    name: str
+    name: name_literal
 
 
 class UserResponseScheme(BaseModel):
     id: serial_number
-    name: str
+    name: name_literal
 
     # load data from database using "."
     model_config = ConfigDict(from_attributes=True)
