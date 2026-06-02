@@ -3,21 +3,34 @@ from pathlib import Path
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Dynamically resolve the path to the .env file.
-# Search upwards from this file's location (up to 5 levels) to find it.
-current_dir = Path(__file__).resolve().parent
-env_file_path = None
-for _ in range(6):
-    candidate = current_dir / ".env"
-    if candidate.exists() and candidate.is_file():
-        env_file_path = candidate
-        break
-    current_dir = current_dir.parent
 
-if env_file_path is None:
-    env_file_path = Path.cwd() / ".env"
-    if not env_file_path.exists():
-        env_file_path = ".env"
+def _resolve_env_file() -> Path:
+    # 1. Check current working directory
+    cwd_env = Path.cwd() / ".env"
+    if cwd_env.is_file():
+        return cwd_env
+
+    # 2. Check relative to this file's position
+    this_file = Path(__file__).resolve()
+
+    # Project root (momentum_interview/.env) - 5 directories up from core/config.py
+    if len(this_file.parents) >= 5:
+        root_env = this_file.parents[4] / ".env"
+        if root_env.is_file():
+            return root_env
+
+    # 3. Backend root (source/backend/.env or /source/.env) - 3 directories up from core/config.py
+    if len(this_file.parents) >= 3:
+        backend_env = this_file.parents[2] / ".env"
+        if backend_env.is_file():
+            return backend_env
+
+    raise RuntimeError(
+        ".env file is required to run application. Move .env.example to .env"
+    )
+
+
+env_file_path = _resolve_env_file()
 
 
 class Settings(BaseSettings):

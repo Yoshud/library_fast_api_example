@@ -10,6 +10,7 @@ RUN uv sync --frozen --no-install-project --no-dev
 # Copy the application code
 COPY source/backend/app ./app
 COPY source/backend/migrations ./migrations
+COPY .env* ./
 
 COPY source/backend/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
