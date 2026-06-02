@@ -1,0 +1,16 @@
+All operations (especially basic_controllers) should be run under transaction or with commit after them (transaction
+is recommended). Some operations can run without it, but there is no reason to doing so - all are safe to be run
+under transaction, but some operation only do "db.flush()"
+
+```
+    book_title = await BookTitleService.create_book_title(db, data)
+    await db.commit()
+```
+
+or
+
+Recommended:
+```
+    async with db.begin():
+        book_title = await BookTitleService.create_book_title(db, data)
+```

@@ -7,7 +7,7 @@ from app.utils.types import serial_number, name_literal
 from app.schemas import BookTitleCreateScheme
 
 
-class UserService:
+class BookTitleService:
     @staticmethod
     async def get_book_title(db: AsyncSession, book_title_id: serial_number) -> BookTitle | None:
         result = await db.execute(select(BookTitle).where(BookTitle.id == book_title_id))
@@ -30,7 +30,7 @@ class UserService:
     async def create_book_title(db: AsyncSession, book_title_data: BookTitleCreateScheme) -> BookTitle:
         book_title = BookTitle(title=book_title_data.title, author=book_title_data.author)
         db.add(book_title)
-        await db.commit()
+        await db.flush()
         # value and id will be set thanks to 'expire_on_commit=False' in async_sessionmaker
         return book_title
 

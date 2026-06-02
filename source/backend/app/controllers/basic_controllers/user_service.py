@@ -24,7 +24,7 @@ class UserService:
         # TODO: get user serial number and check
         user = User(title=user_data.name)
         db.add(user)
-        await db.commit()
+        await db.flush()
         # value and id will be set thanks to 'expire_on_commit=False' in async_sessionmaker
         return user
 
