@@ -1,4 +1,3 @@
-from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 from app.utils.types import serial_number_db, name_literal_db
@@ -9,4 +8,4 @@ class User(Base):
 
     name: Mapped[name_literal_db] = mapped_column(unique=False, index=True)
 
-    books: Mapped[list["BookCopy"]] = relationship(back_populates="user")
+    book_copies: Mapped[list["BookCopy"]] = relationship(back_populates="user")

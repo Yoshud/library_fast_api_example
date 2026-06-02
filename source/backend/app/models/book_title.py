@@ -11,7 +11,7 @@ class BookTitle(Base):
     # TODO: there is possibility for book to not have author or have multiple authors and so on - but for now KISS
     author: Mapped[name_literal_db] = mapped_column(index=True, unique=False, nullable=False)
 
-    books_copies: Mapped[list["BookCopy"]] = relationship(back_populates="book_title")
+    book_copies: Mapped[list["BookCopy"]] = relationship(back_populates="book_title")
 
     __table_args__ = (
         Index('title', 'author'),

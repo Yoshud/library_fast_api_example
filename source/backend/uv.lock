@@ -569,6 +569,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "fastapi", extra = ["standard"] },
     { name = "pydantic-settings" },
+    { name = "ruff" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
 
@@ -584,6 +585,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.29.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.136.3" },
     { name = "pydantic-settings", specifier = ">=2.2.1" },
+    { name = "ruff", specifier = ">=0.15.15" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.50" },
 ]
 

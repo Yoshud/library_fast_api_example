@@ -12,7 +12,7 @@ class BookCopy(Base):
     borrowing_time: Mapped[datetime_tz_db | None]
 
     book_title_id: Mapped[int] = mapped_column(ForeignKey("BookTitle.id", ondelete="RESTRICT"), nullable=False)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("user.id", ondelete="RESTRICT"), default=None)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("User.id", ondelete="RESTRICT"), default=None)
 
     book_title: Mapped["BookTitle"] = relationship(back_populates="book_copies")
     user: Mapped["User"] = relationship(back_populates="book_copies")
