@@ -1,23 +1,27 @@
-from app.models.book_copy import BookCopy
-from app.utils.pg_errors import get_pg_error_code, FOREIGN_KEY_VIOLATION_PG_ERROR_CODE
-from app.utils.types import serial_number
-
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.book_copy import BookCopy
+from app.utils.pg_errors import FOREIGN_KEY_VIOLATION_PG_ERROR_CODE, get_pg_error_code
+from app.utils.types import serial_number
 
 
-class BookCopyRepositoryException(Exception):
+class BookCopyRepositoryError(Exception):
     pass
 
-class BookCopyRepositoryDuplicateIdException(BookCopyRepositoryException):
+
+class BookCopyRepositoryDuplicateIdError(BookCopyRepositoryError):
     pass
 
-class BookCopyServiceNoBookInfoException(BookCopyRepositoryException):
+
+class BookCopyServiceNoBookInfoError(BookCopyRepositoryError):
     pass
 
-class BookCopyRepositoryUnknownIntegrityException(BookCopyRepositoryException):
+
+class BookCopyRepositoryUnknownIntegrityError(BookCopyRepositoryError):
     pass
+
 
 class BookCopyRepository:
     @staticmethod
@@ -26,7 +30,7 @@ class BookCopyRepository:
         stmt = (
             insert(BookCopy)
             .values(id=book_copy_id, book_title_id=book_title_id)
-            .on_conflict_do_nothing(index_elements=['id'])
+            .on_conflict_do_nothing(index_elements=["id"])
             .returning(BookCopy)
         )
 
@@ -36,11 +40,11 @@ class BookCopyRepository:
         except IntegrityError as e:
             pg_error_code = get_pg_error_code(e)
             if pg_error_code == FOREIGN_KEY_VIOLATION_PG_ERROR_CODE:
-                raise BookCopyServiceNoBookInfoException from e
+                raise BookCopyServiceNoBookInfoError from e
 
-            raise BookCopyRepositoryUnknownIntegrityException from e
+            raise BookCopyRepositoryUnknownIntegrityError from e
 
         # returning will return None if object exist
         if book_copy is None:
-            raise BookCopyRepositoryDuplicateIdException
+            raise BookCopyRepositoryDuplicateIdError
         return book_copy

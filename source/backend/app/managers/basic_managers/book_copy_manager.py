@@ -1,13 +1,13 @@
-from app.repositories.book_copy_repository import BookCopyRepository
-from app.models import BookCopy
-from app.utils.db_utils import optional_transaction
-from app.utils.types import serial_number
-
 from logging import getLogger
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models import BookCopy
+from app.repositories.book_copy_repository import BookCopyRepository
+from app.utils.db_utils import optional_transaction
+from app.utils.types import serial_number
 
 logger = getLogger()
 
@@ -15,7 +15,7 @@ logger = getLogger()
 class BookCopyManager:
     def __init__(
         self,
-        book_copy_repository: BookCopyRepository = Depends(),
+        book_copy_repository: Annotated[BookCopyRepository, Depends()],
     ):
         self.book_copy_repository = book_copy_repository
 

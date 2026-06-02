@@ -9,8 +9,8 @@ class BookTitleCreateScheme(BaseModel):
 
 
 class BookTitleUpdateScheme(BaseModel):
-    title: name_literal|None = None
-    author: name_literal|None = None
+    title: name_literal | None = None
+    author: name_literal | None = None
 
 
 class BookTitleResponseScheme(BaseModel):

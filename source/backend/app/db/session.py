@@ -1,4 +1,5 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from app.core.config import settings
 
 # Create async engine
@@ -13,9 +14,5 @@ engine = create_async_engine(
 # underneath but without race condition possible. Tradeoff is potentially stale data in longer session which is
 # unlikely for short liven - one query typical fastAPI sessions
 SessionLocal = async_sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    autocommit=False,
-    autoflush=False,
-    expire_on_commit=False
+    bind=engine, class_=AsyncSession, autocommit=False, autoflush=False, expire_on_commit=False
 )

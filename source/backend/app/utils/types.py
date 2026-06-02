@@ -1,18 +1,22 @@
 from datetime import datetime
 from typing import Annotated
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, DateTime
+
 from pydantic import AwareDatetime, Field
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import mapped_column
 
 
-exactly_n_digits_regex = lambda number: "^\d{" + str(number) + r"}$"
-exactly_n_digits_field = lambda number: Field(
-    min_length=number, max_length=number, pattern=exactly_n_digits_regex(number)
-)
+def exactly_n_digits_regex(number: int):
+    return r"^\d{" + str(number) + r"}$"
+
+
+def exactly_n_digits_field(number: int):
+    return Field(min_length=number, max_length=number, pattern=exactly_n_digits_regex(number))
+
 
 # ****************** SCHEMES TYPES ****************************
 """
-Change here probably should have similar change in DB TYPES. 
+Change here probably should have similar change in DB TYPES.
 """
 serial_number = Annotated[str, exactly_n_digits_field(6)]
 name_literal = Annotated[str, Field(max_length=255)]
@@ -22,7 +26,7 @@ datetime_tz = AwareDatetime
 
 # ********************* DB TYPES ******************************
 """
-Change here probably should have similar change in SCHEMES TYPES. 
+Change here probably should have similar change in SCHEMES TYPES.
 Change here will induce migration - it's expected behaviour!
 """
 

@@ -1,17 +1,19 @@
-from app.repositories.user_repository import UserRepository
-from app.models import User
-from app.schemas import UserCreateScheme
-from app.utils.db_utils import optional_transaction
-from app.utils.types import serial_number
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import User
+from app.repositories.user_repository import UserRepository
+from app.schemas import UserCreateScheme
+from app.utils.db_utils import optional_transaction
+from app.utils.types import serial_number
 
 
 class UserManager:
     def __init__(
         self,
-        user_repository: UserRepository = Depends(),
+        user_repository: Annotated[UserRepository, Depends()],
     ):
         self.user_repository = user_repository
 

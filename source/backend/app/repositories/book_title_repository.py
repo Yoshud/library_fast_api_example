@@ -1,10 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import BookTitle
-
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.utils.types import serial_number, name_literal
+from app.models import BookTitle
 from app.schemas import BookTitleCreateScheme
+from app.utils.types import name_literal, serial_number
 
 
 class BookTitleRepository:

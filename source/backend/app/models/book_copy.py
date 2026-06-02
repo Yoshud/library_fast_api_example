@@ -1,9 +1,11 @@
-from app.models.base import Base
-from app.utils.types import serial_number_db, datetime_tz_db
-
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.models.base import Base
+from app.models.book_title import BookTitle
+from app.models.user import User
+from app.utils.types import datetime_tz_db, serial_number_db
 
 
 class BookCopy(Base):

@@ -16,5 +16,37 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
-    "ruff>=0.3.0",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle (style errors)
+    "W",   # pycodestyle (style warnings)
+    "F",   # Pyflakes (common errors, e.g., unused imports)
+    "I",   # isort (automatic import sorting)
+    "B",   # flake8-bugbear (potential bugs and design flaws)
+    "UP",  # pyupgrade (modernize syntax to the target Python version)
+    "N",   # pep8-naming (naming conventions for variables/classes)
+]
+
+ignore = [
+    "E501",
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

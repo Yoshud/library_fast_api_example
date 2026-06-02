@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.base import Base
-from app.utils.types import serial_number_db, name_literal_db
+from app.utils.types import name_literal_db, serial_number_db
 
 
 class User(Base):
@@ -8,4 +9,4 @@ class User(Base):
 
     name: Mapped[name_literal_db] = mapped_column(unique=False, index=True)
 
-    book_copies: Mapped[list["BookCopy"]] = relationship(back_populates="user")
+    book_copies: Mapped[list["BookCopy"]] = relationship(back_populates="user")  # noqa F821

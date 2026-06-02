@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.utils.types import serial_number, name_literal
+from app.utils.types import name_literal, serial_number
 
 
 class UserCreateScheme(BaseModel):

@@ -1,18 +1,20 @@
-from app.models import User
-from app.utils.types import serial_number
-from app.schemas import UserCreateScheme
-
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import User
+from app.schemas import UserCreateScheme
+from app.utils.types import serial_number
 
 
 class UserRepositoryError(Exception):
     pass
 
+
 class UserRepositoryDuplicateIdError(UserRepositoryError):
     pass
+
 
 class UserRepositoryUnknownIntegrityError(UserRepositoryError):
     pass
@@ -20,7 +22,7 @@ class UserRepositoryUnknownIntegrityError(UserRepositoryError):
 
 class UserRepository:
     @staticmethod
-    async def get_user(db: AsyncSession, user_id: serial_number) -> User|None:
+    async def get_user(db: AsyncSession, user_id: serial_number) -> User | None:
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
         return user
@@ -36,7 +38,7 @@ class UserRepository:
         stmt = (
             insert(User)
             .values(id=user_data.id, name=user_data.name)
-            .on_conflict_do_nothing(index_elements=['id'])
+            .on_conflict_do_nothing(index_elements=["id"])
             .returning(User)
         )
 
