@@ -4,6 +4,7 @@ from app.utils.types import serial_number, name_literal
 
 
 class UserCreateScheme(BaseModel):
+    id: serial_number
     name: name_literal
 
 

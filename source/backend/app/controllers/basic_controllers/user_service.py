@@ -1,10 +1,21 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import User
-
-from sqlalchemy import select
-
 from app.utils.types import serial_number
 from app.schemas import UserCreateScheme
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import IntegrityError
+
+
+class UserServiceError(Exception):
+    pass
+
+class UserServiceDuplicateIdError(UserServiceError):
+    pass
+
+class UserServiceUnknownIntegrityError(UserServiceError):
+    pass
 
 
 class UserService:
@@ -21,12 +32,24 @@ class UserService:
 
     @staticmethod
     async def create_user(db: AsyncSession, user_data: UserCreateScheme) -> User:
-        # TODO: get user serial number and check
-        user = User(title=user_data.name)
-        db.add(user)
-        await db.flush()
-        # value and id will be set thanks to 'expire_on_commit=False' in async_sessionmaker
-        return user
+        # only postgresql option -> atomic operation - safe in async
+        stmt = (
+            insert(User)
+            .values(id=user_data.id, name=user_data.name)
+            .on_conflict_do_nothing(index_elements=['id'])
+            .returning(User)
+        )
+
+        try:
+            result = await db.execute(stmt)
+            book_copy = result.scalar_one_or_none()
+        except IntegrityError as e:
+            raise UserServiceUnknownIntegrityError from e
+
+        # returning will return None if object exist
+        if book_copy is None:
+            raise UserServiceDuplicateIdError
+        return book_copy
 
     @staticmethod
     async def update_user(db: AsyncSession):

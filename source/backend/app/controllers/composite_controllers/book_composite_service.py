@@ -1,7 +1,7 @@
 from app.controllers.basic_controllers.book_copy_service import BookCopyService, BookCopyServiceException
 from app.controllers.basic_controllers.book_title_service import BookTitleService
 from app.models import BookCopy
-from app.schemas import BookTitleCreateScheme
+from app.schemas import BookTitleCreateScheme, BookUpdateBorrowersScheme
 from app.utils.db_utils import optional_transaction
 from app.utils.pg_errors import get_pg_error_code, FOREIGN_KEY_VIOLATION_PG_ERROR_CODE
 from app.utils.types import serial_number
@@ -40,7 +40,7 @@ class BookCompositeService:
     @staticmethod
     async def create_book_copy_with_book_title(db: AsyncSession,
             book_copy_id: serial_number,
-            book_title_data: BookTitleCreateScheme):
+            book_title_data: BookTitleCreateScheme) -> BookCopy:
         async with optional_transaction(db):
             book_title = await BookTitleService.create_book_title(db, book_title_data)
 
@@ -59,16 +59,16 @@ class BookCompositeService:
     @staticmethod
     async def update_books_borrowers(
             db: AsyncSession,
-            updates: dict[serial_number, serial_number | None] # book_copy_id -> user_id or None (returning)
+            data: BookUpdateBorrowersScheme
     ) -> list[BookCopy]:
-        if not updates:
+        if not data.update_borrowers_map:
             return []
 
         # CRITICAL - ids are sorted so deadlock shouldn't be possible when multiple updates will start in same time
         # ( further ones will stop immanently or immanently after encounter first different update )
         # what relly mean sorted is not important - they just need to be in specific always same order
         # also ignore redundant ones
-        requested_ids = sorted(updates.keys())
+        requested_ids = sorted(data.update_borrowers_map.keys())
 
         async with optional_transaction(db):
             # We lock rows in table it's only safe option
@@ -84,7 +84,7 @@ class BookCompositeService:
                     raise BookCompositeBookCopyNotFoundException(copy_id)
 
                 copy = existing_copies[copy_id]
-                new_user_id = updates[copy_id]
+                new_user_id = data.update_borrowers_map[copy_id]
 
                 # Option 1: Try borrowing book
                 if new_user_id is not None:

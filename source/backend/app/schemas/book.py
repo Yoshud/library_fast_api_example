@@ -5,13 +5,13 @@ from app.schemas import BookTitleResponseScheme, BookTitleCreateScheme
 from app.schemas import UserResponseScheme
 
 
-class BookCopyCreateScheme(BaseModel):
+class BookCreateScheme(BaseModel):
     id: serial_number
     book_title: BookTitleCreateScheme|None = None
     book_title_id: int|None = None
 
     @model_validator(mode="after")
-    def check_book_title_presence(self) -> "BookCopyCreateScheme":
+    def check_book_title_presence(self) -> "BookCreateScheme":
         # TODO: Test that!
         if self.book_title is not None and self.book_title_id is not None:
             raise ValueError(
@@ -24,25 +24,23 @@ class BookCopyCreateScheme(BaseModel):
         return self
 
 
-class BookCopyUpdateScheme(BaseModel):
-    remove_user: bool = False
-    user_id: int|None = None
-    # Setting remove_user = False and user_id to None will just change nothing
-
-    @model_validator(mode="after")
-    def check_user_action(self) -> "BookCopyUpdateScheme":
-        # TODO: test that
-        if self.remove_user and self.user_id is not None:
-            raise ValueError(
-                "If you want to remove user - don't provide user_id"
-            )
-        return self
+class BookUpdateBorrowersScheme(BaseModel):
+    update_borrowers_map: dict[serial_number, serial_number | None] # book_copy_id -> user_id or None (returning)
 
 
-class BookCopyResponseScheme(BaseModel):
+class BookResponseScheme(BaseModel):
+    # TODO: check that
     id: serial_number
     book_title: BookTitleResponseScheme
     user: UserResponseScheme|None
+
+    # load data from database using "."
+    model_config = ConfigDict(from_attributes=True)
+
+class BookResponseBasicScheme(BaseModel):
+    id: serial_number
+    book_title_id: BookTitleResponseScheme
+    user_id: UserResponseScheme|None
 
     # load data from database using "."
     model_config = ConfigDict(from_attributes=True)
