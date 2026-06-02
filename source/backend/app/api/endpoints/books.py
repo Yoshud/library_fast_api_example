@@ -1,8 +1,9 @@
 from app.api.deps import get_db
-from app.controllers.basic_controllers.book_copy_service import BookCopyService
-from app.controllers.composite_controllers.book_composite_service import BookCompositeService
 
-from app.schemas import BookCreateScheme, BookResponseScheme, BookUpdateBorrowersScheme, BookResponseBasicScheme
+from app.managers.basic_managers.book_copy_manager import BookCopyManager
+from app.managers.composite_managers.book_manager import BookManager
+
+from app.schemas import BookCreateScheme, BookResponseBasicScheme
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,18 +16,10 @@ router = APIRouter()
 async def create_book(
     book_data: BookCreateScheme,
     db: AsyncSession = Depends(get_db),
+    book_manager: BookManager = Depends(),
+    book_copy_manager: BookCopyManager = Depends()
 ):
+    # "bad" cases are supported by pydantic
     if book_data.book_title_id is not None:
-        if book_data.book_title is not None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Only one value of fields 'book_title_id' and 'book_title' can be set",
-            )
-
-        async with db.begin():
-            book = await BookCopyService.create_book_copy(db, book_data.id, book_data.book_title_id)
-    else:
-        async with db.begin():
-            book = await BookCompositeService.create_book_copy_with_book_title(db, book_data.id, book_data.book_title)
-
-    return book
+        return await book_copy_manager.create_book_copy(db, book_data.id, book_data.book_title_id)
+    return await book_manager.create_book_copy_with_book_title(db, book_data.id, book_data.book_title)

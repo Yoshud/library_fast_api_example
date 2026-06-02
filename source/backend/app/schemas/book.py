@@ -39,8 +39,8 @@ class BookResponseScheme(BaseModel):
 
 class BookResponseBasicScheme(BaseModel):
     id: serial_number
-    book_title_id: BookTitleResponseScheme
-    user_id: UserResponseScheme|None
+    book_title_id: int
+    user_id: serial_number|None
 
     # load data from database using "."
     model_config = ConfigDict(from_attributes=True)

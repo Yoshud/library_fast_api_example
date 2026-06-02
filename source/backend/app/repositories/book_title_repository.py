@@ -7,7 +7,7 @@ from app.utils.types import serial_number, name_literal
 from app.schemas import BookTitleCreateScheme
 
 
-class BookTitleService:
+class BookTitleRepository:
     @staticmethod
     async def get_book_title(db: AsyncSession, book_title_id: serial_number) -> BookTitle | None:
         result = await db.execute(select(BookTitle).where(BookTitle.id == book_title_id))
@@ -16,7 +16,7 @@ class BookTitleService:
 
     @staticmethod
     async def get_book_title_by_title(db: AsyncSession, title: name_literal, author: name_literal) -> BookTitle | None:
-        result = await db.execute(select(BookTitle).where(BookTitle.title == title and BookTitle.author == author))
+        result = await db.execute(select(BookTitle).where(BookTitle.title == title, BookTitle.author == author))
         # Composite index on model level ensure 0 or 1 book title as response
         book_title = result.scalar_one_or_none()
         return book_title

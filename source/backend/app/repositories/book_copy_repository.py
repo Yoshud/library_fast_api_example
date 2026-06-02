@@ -7,19 +7,19 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 
 
-class BookCopyServiceException(Exception):
+class BookCopyRepositoryException(Exception):
     pass
 
-class BookCopyServiceDuplicateIdException(BookCopyServiceException):
+class BookCopyRepositoryDuplicateIdException(BookCopyRepositoryException):
     pass
 
-class BookCopyServiceNoBookInfoException(BookCopyServiceException):
+class BookCopyServiceNoBookInfoException(BookCopyRepositoryException):
     pass
 
-class BookCopyServiceUnknownIntegrityException(BookCopyServiceException):
+class BookCopyRepositoryUnknownIntegrityException(BookCopyRepositoryException):
     pass
 
-class BookCopyService:
+class BookCopyRepository:
     @staticmethod
     async def create_book_copy(db: AsyncSession, book_copy_id: serial_number, book_title_id: int) -> BookCopy:
         # only postgresql option -> atomic operation - safe in async
@@ -38,9 +38,9 @@ class BookCopyService:
             if pg_error_code == FOREIGN_KEY_VIOLATION_PG_ERROR_CODE:
                 raise BookCopyServiceNoBookInfoException from e
 
-            raise BookCopyServiceUnknownIntegrityException from e
+            raise BookCopyRepositoryUnknownIntegrityException from e
 
         # returning will return None if object exist
         if book_copy is None:
-            raise BookCopyServiceDuplicateIdException
+            raise BookCopyRepositoryDuplicateIdException
         return book_copy

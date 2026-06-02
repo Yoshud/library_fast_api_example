@@ -1,5 +1,5 @@
 from app.api.deps import get_db
-from app.controllers.basic_controllers.user_service import UserService
+from app.managers.basic_managers.user_manager import UserManager
 from app.schemas import UserResponseScheme, UserCreateScheme
 from app.utils.types import serial_number
 
@@ -15,9 +15,9 @@ async def read_users(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
+    user_manager: UserManager = Depends(),
 ):
-    async with db.begin():
-        users = await UserService.get_users(db, skip, limit)
+    users = await user_manager.get_users(db, skip, limit)
     return users
 
 
@@ -25,9 +25,9 @@ async def read_users(
 async def read_user(
     user_id: serial_number,
     db: AsyncSession = Depends(get_db),
+    user_manager: UserManager = Depends(),
 ):
-    async with db.begin():
-        user = await UserService.get_user(db, user_id)
+    user = await user_manager.get_user(db, user_id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -40,8 +40,7 @@ async def read_user(
 async def create_user(
     user_data: UserCreateScheme,
     db: AsyncSession = Depends(get_db),
+    user_manager: UserManager = Depends(),
 ):
-    async with db.begin():
-        user = await UserService.create_user(db, user_data)
-
+    user = await user_manager.create_user(db, user_data)
     return user

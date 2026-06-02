@@ -1,5 +1,5 @@
-All operations (especially basic_controllers) should be run under transaction or with commit after them (transaction
-is recommended). Some operations can run without it, but there is no reason to doing so - all are safe to be run
+All create and probably update operations should be run under transaction or with commit after them (transaction
+is recommended). Read operations can run without it, but there is no reason to doing so - all are safe to be run
 under transaction, but some operation only do "db.flush()"
 
 ```

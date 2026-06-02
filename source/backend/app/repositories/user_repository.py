@@ -8,17 +8,17 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 
 
-class UserServiceError(Exception):
+class UserRepositoryError(Exception):
     pass
 
-class UserServiceDuplicateIdError(UserServiceError):
+class UserRepositoryDuplicateIdError(UserRepositoryError):
     pass
 
-class UserServiceUnknownIntegrityError(UserServiceError):
+class UserRepositoryUnknownIntegrityError(UserRepositoryError):
     pass
 
 
-class UserService:
+class UserRepository:
     @staticmethod
     async def get_user(db: AsyncSession, user_id: serial_number) -> User|None:
         result = await db.execute(select(User).where(User.id == user_id))
@@ -42,14 +42,14 @@ class UserService:
 
         try:
             result = await db.execute(stmt)
-            book_copy = result.scalar_one_or_none()
+            user = result.scalar_one_or_none()
         except IntegrityError as e:
-            raise UserServiceUnknownIntegrityError from e
+            raise UserRepositoryUnknownIntegrityError from e
 
         # returning will return None if object exist
-        if book_copy is None:
-            raise UserServiceDuplicateIdError
-        return book_copy
+        if user is None:
+            raise UserRepositoryDuplicateIdError
+        return user
 
     @staticmethod
     async def update_user(db: AsyncSession):
