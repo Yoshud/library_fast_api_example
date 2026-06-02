@@ -7,7 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class BookCopy(Base):
-    id: Mapped[serial_number_db] = mapped_column(primary_key=True, index=True)
+    id: Mapped[serial_number_db] = mapped_column(primary_key=True, index=True, autoincrement=False)
 
     borrowing_time: Mapped[datetime_tz_db | None]
 
@@ -20,17 +20,3 @@ class BookCopy(Base):
     @hybrid_property
     def is_borrowed(self) -> bool:
         return self.user_id is not None
-
-
-    # @validates("user_id")
-    # def update_borrowing_time(self, key: str, value: int | None) -> int | None:
-    #     if value != self.user_id:
-    #         if value is not None:
-    #             # Książka zostaje wypożyczona -> ustawiamy aktualny czas (z UTC)
-    #             self.borrowing_time = datetime.now(timezone.utc)
-    #         else:
-    #             # Książka zostaje zwrócona -> zerujemy czas
-    #             self.borrowing_time = None
-    #
-    #     # Zawsze musisz zwrócić `value`, aby faktycznie zapisało się w `user_id`!
-    #     return value
