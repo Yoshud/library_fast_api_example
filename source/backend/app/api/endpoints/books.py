@@ -5,7 +5,7 @@ from app.managers.composite_managers.book_manager import BookManager
 
 from app.schemas import BookCreateScheme, BookResponseBasicScheme
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

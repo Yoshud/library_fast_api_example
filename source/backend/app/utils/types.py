@@ -5,7 +5,7 @@ from sqlalchemy import String, DateTime
 from pydantic import AwareDatetime, Field
 
 
-exactly_n_digits_regex = lambda number: "^\d{" + number + r"}$"
+exactly_n_digits_regex = lambda number: "^\d{" + str(number) + r"}$"
 exactly_n_digits_field = lambda number: Field(
     min_length=number, max_length=number, pattern=exactly_n_digits_regex(number)
 )

@@ -10,6 +10,8 @@ RUN uv sync --frozen --no-install-project --no-dev
 # Copy the application code
 COPY source/backend/app ./app
 
+
+
 # Expose port 5000 to match docker-compose configuration
 EXPOSE 5000
 

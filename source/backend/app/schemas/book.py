@@ -1,8 +1,8 @@
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.utils.types import serial_number
-from app.schemas import BookTitleResponseScheme, BookTitleCreateScheme
-from app.schemas import UserResponseScheme
+from app.schemas.book_title import BookTitleResponseScheme, BookTitleCreateScheme
+from app.schemas.user import UserResponseScheme
 
 
 class BookCreateScheme(BaseModel):
