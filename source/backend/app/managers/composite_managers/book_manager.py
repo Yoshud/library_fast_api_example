@@ -1,12 +1,14 @@
-from datetime import UTC, datetime
+from datetime import datetime
 from logging import getLogger
 from typing import Annotated
+from zoneinfo import ZoneInfo
 
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import BookCopy
 from app.repositories.book_copy_repository import BookCopyRepository, BookCopyRepositoryError
 from app.repositories.book_title_repository import BookTitleRepository
@@ -85,8 +87,7 @@ class BookManager:
             result = await db.execute(stmt)
             existing_copies = {copy.id: copy for copy in result.scalars()}
 
-            # TODO: Przenieść strefę czasową do konfiguracji aplikacji
-            now = datetime.now(UTC)
+            now = datetime.now(ZoneInfo(settings.TIMEZONE))
 
             for copy_id in requested_ids:
                 if copy_id not in existing_copies:

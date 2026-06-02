@@ -5,8 +5,7 @@ from app.core.config import settings
 # Create async engine
 engine = create_async_engine(
     settings.database_url,
-    # TODO: add this as some env value
-    echo=True,  # Set to False in production
+    echo=(settings.ENVIRONMENT == "development"),
 )
 
 # Expire on commit = False gives as possibility to get id of data after saving object without race condition
