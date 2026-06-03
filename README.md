@@ -27,6 +27,20 @@ To run the application (both locally and via Docker), a `.env` file is required 
   - `ENVIRONMENT`: Defines database query logging and runtime parameters. Allowed values: `development`, `production`.
   - `TIMEZONE`: Defines the application-wide timezone used for datetimes (e.g., `UTC`, `Europe/Warsaw`).
 
+### Build docker
+```bash
+docker compose build
+```
+
+### Run App
+```bash
+docker compose up
+# or detach:
+docker compose up -d
+```
+
+### Stop App
+
 ### Error Handling
 
 The application will fail to start and throw a `RuntimeError` if the `.env` file is not present in either the project root or the current working directory.
@@ -36,25 +50,25 @@ When running inside Docker containers, the entrypoint script `entrypoint.sh` wil
 ### Maintenance
 
 Run formatter:
-```
+```bash
 cd source/backend
 uv run ruff format .
 ```
 
 Run linter:
-```
+```bash
 cd source/backend
 uv run ruff check . --fix
 ```
 
 Run migration (in separate container with separated empty volume):
-```
+```bash
 cd source/backend
 ./makemigration.sh {migration name}
 ```
 
 Run tests:
-```
+```bash
 cd source/backend
 uv run pytest
 ```
