@@ -33,5 +33,5 @@ Change here will induce migration - it's expected behaviour!
 serial_number_db = Annotated[str, mapped_column(String(6))]
 name_literal_db = Annotated[str, mapped_column(String(255))]
 
-datetime_tz_db = Annotated[datetime, DateTime(timezone=True)]
+datetime_tz_db = Annotated[datetime, mapped_column(DateTime(timezone=True))]
 # *************************************************************
