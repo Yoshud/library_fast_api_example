@@ -5,15 +5,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.managers.basic_managers.book_copy_manager import BookCopyManager
-from app.managers.composite_managers.book_manager import BookManager
+from app.managers.composite_managers.book_manager import BookManager, BookManagerAlreadyBorrowedError, \
+    BookManagerUserNotFoundError, BookManagerBookCopyNotFoundError
 from app.repositories.book_copy_repository import (
     BookCopyRepositoryDuplicateIdError,
     BookCopyRepositoryNoBookInfoError,
 )
-from app.schemas import BookCreateScheme, BookResponseBasicScheme, BookResponseScheme
+from app.schemas import BookCreateScheme, BookResponseBasicScheme, BookResponseScheme, BookUpdateBorrowersScheme
 from app.utils.types import serial_number
 
 router = APIRouter()
+
+
+# TODO: Add HATEOS
 
 
 @router.post("/", response_model=BookResponseBasicScheme, status_code=status.HTTP_201_CREATED)
@@ -62,3 +66,29 @@ async def get_book(
             detail="Boook not found",
         )
     return book
+
+
+@router.put("/", response_model=list[BookResponseBasicScheme], responses={404: {"description": "Book copy or User not found"}, 409: {"description": "Some book is borrowed by somebody else"}})
+async def update_borrowers(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    book_manager: Annotated[BookManager, Depends()],
+    borrower_update_data: BookUpdateBorrowersScheme,
+):
+    try:
+        books = await book_manager.update_books_borrowers(db, borrower_update_data)
+        return books
+    except BookManagerAlreadyBorrowedError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Book {e.book_copy_id} is already borrowed by user {e.already_borrowing_user_id} - all operations cancelled",
+        ) from e
+    except BookManagerUserNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"One or more users is not found - all operations cancelled",
+        ) from e
+    except BookManagerBookCopyNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Book {e.book_copy_id} is not found - all operations cancelled",
+        ) from e

@@ -99,7 +99,11 @@ class BookManager:
                 # Option 1: Try borrowing book
                 if new_user_id is not None:
                     if copy.user_id is not None:
-                        raise BookManagerAlreadyBorrowedError(copy_id, copy.user_id)
+                        if copy.user_id == new_user_id:
+                            logger.warning("Try to borrow already borrowed book by same user - operation is idempotent - continue")
+                            continue
+                        else:
+                            raise BookManagerAlreadyBorrowedError(copy_id, copy.user_id)
 
                     # new values
                     copy.user_id = new_user_id
@@ -108,7 +112,7 @@ class BookManager:
                 # Option 2: Try to return book
                 else:
                     if copy.user_id is None:
-                        logger.warning("Try to return already returned book - operation is idempotent")
+                        logger.warning("Try to return already returned book - operation is idempotent - continue")
 
                     copy.user_id = None
                     copy.borrowing_time = None
