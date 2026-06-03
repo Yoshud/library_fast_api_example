@@ -47,3 +47,13 @@ async def test_get_user_list_with_data(client):
     ids = [u["id"] for u in data]
     assert "100010" in ids
     assert "100011" in ids
+
+async def test_create_user_with_leading_zeros(client):
+    user_data = {"id": "000011", "name": "Leading Zeros User"}
+    response = await client.post("/api/users/", json=user_data)
+    assert response.status_code == 201
+    assert response.json()["id"] == "000011"
+    
+    get_response = await client.get("/api/users/000011")
+    assert get_response.status_code == 200
+    assert get_response.json()["id"] == "000011"

@@ -101,3 +101,46 @@ async def test_update_borrowers_book_not_found(client):
     await client.post("/api/users/", json={"id": "100004", "name": "B1"})
     response = await client.put("/api/books/", json={"update_borrowers_map": {"888888": "100004"}})
     assert response.status_code == 404
+
+async def test_bulk_update_borrowers_borrow_and_return(client):
+    await client.post("/api/users/", json={"id": "100010", "name": "User 1"})
+    await client.post("/api/users/", json={"id": "100011", "name": "User 2"})
+    
+    await client.post("/api/books/", json={"id": "200010", "book_title": {"title": "B1", "author": "A1"}})
+    await client.post("/api/books/", json={"id": "200011", "book_title": {"title": "B2", "author": "A2"}})
+    
+    await client.put("/api/books/", json={"update_borrowers_map": {"200010": "100010"}})
+    
+    update_data = {
+        "update_borrowers_map": {
+            "200010": None,
+            "200011": "100011"
+        }
+    }
+    response = await client.put("/api/books/", json=update_data)
+    assert response.status_code == 200
+    
+    book1_resp = await client.get("/api/books/200010")
+    assert book1_resp.json()["user"] is None
+    
+    book2_resp = await client.get("/api/books/200011")
+    assert book2_resp.json()["user"]["id"] == "100011"
+
+async def test_bulk_update_borrowers_rollback_on_error(client):
+    await client.post("/api/users/", json={"id": "100012", "name": "User 3"})
+    await client.post("/api/books/", json={"id": "200012", "book_title": {"title": "B3", "author": "A3"}})
+    
+    book12_resp_initial = await client.get("/api/books/200012")
+    assert book12_resp_initial.json()["user"] is None
+    
+    update_data = {
+        "update_borrowers_map": {
+            "200012": "100012",
+            "999999": "100012"
+        }
+    }
+    response = await client.put("/api/books/", json=update_data)
+    assert response.status_code == 404
+    
+    book12_resp_after = await client.get("/api/books/200012")
+    assert book12_resp_after.json()["user"] is None
