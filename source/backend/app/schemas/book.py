@@ -25,7 +25,6 @@ class BookUpdateBorrowersScheme(BaseModel):
 
 
 class BookResponseScheme(BaseModel):
-    # TODO: check that
     id: serial_number
     book_title: BookTitleResponseScheme
     user: UserResponseScheme | None
