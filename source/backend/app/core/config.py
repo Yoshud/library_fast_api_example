@@ -1,6 +1,6 @@
-from pathlib import Path
-from typing import Literal, Optional
 from logging import getLogger
+from pathlib import Path
+from typing import Literal
 
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -12,9 +12,7 @@ env_file = Path.cwd() / ".env"
 if not env_file.is_file():
     env_file = Path.cwd() / ".env.test"
     if not env_file.is_file():
-        raise RuntimeError(
-            ".env file is required to run application. Move .env.example to .env"
-        )
+        raise RuntimeError(".env file is required to run application. Move .env.example to .env")
     logger.warning("Use test .env")
 
 

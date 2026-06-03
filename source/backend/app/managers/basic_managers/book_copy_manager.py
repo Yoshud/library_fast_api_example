@@ -32,5 +32,10 @@ class BookCopyManager:
     async def get_book_copy_with_details(self, db: AsyncSession, book_copy_id: serial_number) -> BookCopy | None:
         return await self.book_copy_repository.get_book_copy_with_details(db, book_copy_id)
 
-    async def get_book_copies_with_details(self, db: AsyncSession, skip: int = 0, limit: int = 100,) -> list[BookCopy]:
+    async def get_book_copies_with_details(
+        self,
+        db: AsyncSession,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[BookCopy]:
         return await self.book_copy_repository.get_all_book_copies_with_details(db, skip, limit)

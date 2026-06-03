@@ -5,8 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.managers.basic_managers.book_copy_manager import BookCopyManager
-from app.managers.composite_managers.book_manager import BookManager, BookManagerAlreadyBorrowedError, \
-    BookManagerUserNotFoundError, BookManagerBookCopyNotFoundError
+from app.managers.composite_managers.book_manager import (
+    BookManager,
+    BookManagerAlreadyBorrowedError,
+    BookManagerBookCopyNotFoundError,
+    BookManagerUserNotFoundError,
+)
 from app.repositories.book_copy_repository import (
     BookCopyRepositoryDuplicateIdError,
     BookCopyRepositoryNoBookInfoError,
@@ -43,6 +47,7 @@ async def create_book(
             status_code=status.HTTP_404_NOT_FOUND_CONFLICT, detail=f"Book title id {book_data.book_title_id} not found"
         ) from e
 
+
 @router.get("/", response_model=list[BookResponseScheme])
 async def get_books(
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -53,7 +58,10 @@ async def get_books(
     books = await book_copy_manager.get_book_copies_with_details(db, skip, limit)
     return books
 
-@router.get("/{book_id}", response_model=BookResponseScheme, responses={404: {"description": "Book is not found in database"}})
+
+@router.get(
+    "/{book_id}", response_model=BookResponseScheme, responses={404: {"description": "Book is not found in database"}}
+)
 async def get_book(
     db: Annotated[AsyncSession, Depends(get_db)],
     book_copy_manager: Annotated[BookCopyManager, Depends()],
@@ -68,7 +76,14 @@ async def get_book(
     return book
 
 
-@router.put("/", response_model=list[BookResponseBasicScheme], responses={404: {"description": "Book copy or User not found"}, 409: {"description": "Some book is borrowed by somebody else"}})
+@router.put(
+    "/",
+    response_model=list[BookResponseBasicScheme],
+    responses={
+        404: {"description": "Book copy or User not found"},
+        409: {"description": "Some book is borrowed by somebody else"},
+    },
+)
 async def update_borrowers(
     db: Annotated[AsyncSession, Depends(get_db)],
     book_manager: Annotated[BookManager, Depends()],
@@ -85,7 +100,7 @@ async def update_borrowers(
     except BookManagerUserNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"One or more users is not found - all operations cancelled",
+            detail="One or more users is not found - all operations cancelled",
         ) from e
     except BookManagerBookCopyNotFoundError as e:
         raise HTTPException(

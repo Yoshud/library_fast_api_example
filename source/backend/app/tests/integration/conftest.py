@@ -1,15 +1,15 @@
 import asyncio
-import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from testcontainers.postgres import PostgresContainer
-from alembic.config import Config
-from alembic import command
-from sqlalchemy import NullPool
 
-from app.main import app
+import pytest
+from alembic import command
+from alembic.config import Config
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import NullPool, create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from testcontainers.postgres import PostgresContainer
+
 from app.api.deps import get_db
+from app.main import app
 
 
 @pytest.fixture(scope="session")
@@ -55,11 +55,7 @@ async def db_session(db_engine):
     connection = await db_engine.connect()
     transaction = await connection.begin()
 
-    session = AsyncSession(
-        bind=connection,
-        expire_on_commit=False,
-        join_transaction_mode="create_savepoint"
-    )
+    session = AsyncSession(bind=connection, expire_on_commit=False, join_transaction_mode="create_savepoint")
     yield session
 
     await session.close()
@@ -70,6 +66,7 @@ async def db_session(db_engine):
 @pytest.fixture(scope="function")
 async def client(db_session):
     """Provide an AsyncClient with overridden database dependencies for API testing."""
+
     async def _override_get_db():
         yield db_session
 

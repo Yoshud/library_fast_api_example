@@ -1,3 +1,4 @@
+from datetime import UTC
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -83,8 +84,13 @@ def _make_generic_integrity_error():
 class TestCreateBookCopyWithBookTitle:
     @patch("app.managers.composite_managers.book_manager.optional_transaction", noop_transaction)
     async def test_success(
-        self, book_manager, mock_book_title_repo, mock_book_copy_repo, mock_db,
-        sample_book_title, sample_book_copy,
+        self,
+        book_manager,
+        mock_book_title_repo,
+        mock_book_copy_repo,
+        mock_db,
+        sample_book_title,
+        sample_book_copy,
     ):
         mock_book_title_repo.create_book_title.return_value = sample_book_title
         mock_book_copy_repo.create_book_copy.return_value = sample_book_copy
@@ -95,12 +101,19 @@ class TestCreateBookCopyWithBookTitle:
         assert result == sample_book_copy
         mock_book_title_repo.create_book_title.assert_awaited_once_with(mock_db, book_title_data)
         mock_book_copy_repo.create_book_copy.assert_awaited_once_with(
-            db=mock_db, book_copy_id="000001", book_title_id=sample_book_title.id,
+            db=mock_db,
+            book_copy_id="000001",
+            book_title_id=sample_book_title.id,
         )
 
     @patch("app.managers.composite_managers.book_manager.optional_transaction", noop_transaction)
     async def test_duplicate_copy_propagates_error(
-        self, book_manager, mock_book_title_repo, mock_book_copy_repo, mock_db, sample_book_title,
+        self,
+        book_manager,
+        mock_book_title_repo,
+        mock_book_copy_repo,
+        mock_db,
+        sample_book_title,
     ):
         mock_book_title_repo.create_book_title.return_value = sample_book_title
         mock_book_copy_repo.create_book_copy.side_effect = BookCopyRepositoryDuplicateIdError
@@ -150,10 +163,10 @@ class TestUpdateBooksBorrowers:
     @patch("app.managers.composite_managers.book_manager.optional_transaction", noop_transaction)
     async def test_return_book_success(self, book_manager, mock_db, sample_book_copy):
         """Returning clears user_id and borrowing_time."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         sample_book_copy.user_id = "200001"
-        sample_book_copy.borrowing_time = datetime.now(timezone.utc)
+        sample_book_copy.borrowing_time = datetime.now(UTC)
         _setup_db_for_update(mock_db, [sample_book_copy])
 
         data = BookUpdateBorrowersScheme(update_borrowers_map={"000001": None})
@@ -182,9 +195,9 @@ class TestUpdateBooksBorrowers:
     @patch("app.managers.composite_managers.book_manager.optional_transaction", noop_transaction)
     async def test_borrow_same_user_idempotent(self, book_manager, mock_db, sample_book_copy):
         """Borrowing by the same user is idempotent — no error, value unchanged."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        original_time = datetime.now(timezone.utc)
+        original_time = datetime.now(UTC)
         sample_book_copy.user_id = "200001"
         sample_book_copy.borrowing_time = original_time
         _setup_db_for_update(mock_db, [sample_book_copy])
@@ -265,9 +278,7 @@ class TestUpdateBooksBorrowers:
 
         _setup_db_for_update(mock_db, [copy_a, copy_b])
 
-        data = BookUpdateBorrowersScheme(
-            update_borrowers_map={"000003": "200001", "000001": "200002"}
-        )
+        data = BookUpdateBorrowersScheme(update_borrowers_map={"000003": "200001", "000001": "200002"})
         result = await book_manager.update_books_borrowers(mock_db, data)
 
         # Result order follows sorted keys

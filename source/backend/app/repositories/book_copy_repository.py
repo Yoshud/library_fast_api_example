@@ -1,7 +1,7 @@
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.models.book_copy import BookCopy
@@ -57,10 +57,7 @@ class BookCopyRepository:
         stmt = (
             select(BookCopy)
             .where(BookCopy.id == book_copy_id)
-            .options(
-                joinedload(BookCopy.book_title),
-                joinedload(BookCopy.user)
-            )
+            .options(joinedload(BookCopy.book_title), joinedload(BookCopy.user))
         )
         result = await db.execute(stmt)
         book_copy = result.scalar_one_or_none()
@@ -72,11 +69,9 @@ class BookCopyRepository:
         """Fetch all BookCopies with all their related entities eagerly loaded."""
         stmt = (
             select(BookCopy)
-            .options(
-                joinedload(BookCopy.book_title),
-                joinedload(BookCopy.user)
-            )
-            .offset(skip).limit(limit)
+            .options(joinedload(BookCopy.book_title), joinedload(BookCopy.user))
+            .offset(skip)
+            .limit(limit)
         )
         result = await db.execute(stmt)
         # .unique() is required when using joinedload to handle row deduplication correctly

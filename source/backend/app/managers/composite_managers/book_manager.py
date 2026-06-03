@@ -100,7 +100,9 @@ class BookManager:
                 if new_user_id is not None:
                     if copy.user_id is not None:
                         if copy.user_id == new_user_id:
-                            logger.warning("Try to borrow already borrowed book by same user - operation is idempotent - continue")
+                            logger.warning(
+                                "Try to borrow already borrowed book by same user - operation is idempotent - continue"
+                            )
                             continue
                         else:
                             raise BookManagerAlreadyBorrowedError(copy_id, copy.user_id)
