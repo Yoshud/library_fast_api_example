@@ -44,7 +44,7 @@ async def create_book(
         ) from e
     except BookCopyRepositoryNoBookInfoError as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND_CONFLICT, detail=f"Book title id {book_data.book_title_id} not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Book title id {book_data.book_title_id} not found"
         ) from e
 
 
