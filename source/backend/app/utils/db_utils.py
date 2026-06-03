@@ -10,5 +10,6 @@ async def optional_transaction(db: AsyncSession):
         async with db.begin():
             yield
     else:
-        # if transaction is open - just go
-        yield
+        # if transaction is open - create savepoint
+        async with db.begin_nested():
+            yield

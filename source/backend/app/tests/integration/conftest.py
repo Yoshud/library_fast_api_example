@@ -55,7 +55,11 @@ async def db_session(db_engine):
     connection = await db_engine.connect()
     transaction = await connection.begin()
 
-    session = AsyncSession(bind=connection, expire_on_commit=False)
+    session = AsyncSession(
+        bind=connection,
+        expire_on_commit=False,
+        join_transaction_mode="create_savepoint"
+    )
     yield session
 
     await session.close()
