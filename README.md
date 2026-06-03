@@ -70,5 +70,57 @@ cd source/backend
 Run tests:
 ```bash
 cd source/backend
+# Unit tests only (fast, no DB needed)
+uv run pytest app/tests/unit/ -v
+
+# Integration tests (requires Docker for testcontainers)
+uv run pytest app/tests/integration/ -v
+
+# All tests
 uv run pytest
 ```
+
+---
+
+### CI/CD
+
+This project uses **GitHub Actions** for continuous integration. The pipeline is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs on every push/PR to `main`/`master`.
+
+| Job | Runs | Requires |
+|-----|------|----------|
+| **Lint & Format** | `ruff format --check` + `ruff check` | — |
+| **Unit Tests** | `pytest app/tests/unit/` | — |
+| **Integration Tests** | `pytest app/tests/integration/` | Lint & Unit pass first |
+
+The lint/format and unit test jobs run **in parallel**. Integration tests only start after both pass.
+
+---
+
+### Git Hooks
+
+A `pre-commit` hook is included in the [`hooks/`](hooks/) directory. It runs the formatter check, linter, and unit tests **before each commit**, preventing broken code from entering the repository.
+
+#### Setup (one-time)
+
+Point Git to the `hooks/` directory:
+
+```bash
+git config core.hooksPath hooks
+```
+
+That's it — the `pre-commit` hook will now run automatically on every `git commit`.
+
+#### What it checks
+
+1. `ruff format --check` — code formatting
+2. `ruff check` — linting rules
+3. `pytest app/tests/unit/ -q` — unit tests (~1s)
+
+If any check fails, the commit is rejected. Fix the issues and try again.
+
+#### Skip (emergency only)
+
+```bash
+git commit --no-verify -m "message"
+```
+

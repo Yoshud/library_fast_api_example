@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Git pre-commit hook
+# Runs ruff format check, ruff lint, and unit tests before allowing a commit.
+# Install: see README.md section "Git Hooks"
+
+set -euo pipefail
+
+BACKEND_DIR="source/backend"
+
+echo "=== Pre-commit: Ruff format check ==="
+uv run --directory "$BACKEND_DIR" ruff format --check .
+
+echo "=== Pre-commit: Ruff lint check ==="
+uv run --directory "$BACKEND_DIR" ruff check .
+
+echo "=== Pre-commit: Unit tests ==="
+uv run --directory "$BACKEND_DIR" pytest app/tests/unit/ -q
+
+echo "=== Pre-commit: All checks passed ==="
