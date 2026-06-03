@@ -8,9 +8,10 @@ from app.managers.basic_managers.book_copy_manager import BookCopyManager
 from app.managers.composite_managers.book_manager import BookManager
 from app.repositories.book_copy_repository import (
     BookCopyRepositoryDuplicateIdError,
-    BookCopyServiceNoBookInfoError,
+    BookCopyRepositoryNoBookInfoError,
 )
-from app.schemas import BookCreateScheme, BookResponseBasicScheme
+from app.schemas import BookCreateScheme, BookResponseBasicScheme, BookResponseScheme
+from app.utils.types import serial_number
 
 router = APIRouter()
 
@@ -33,7 +34,31 @@ async def create_book(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"There is already book copy with serial number {book_data.id} in DB",
         ) from e
-    except BookCopyServiceNoBookInfoError as e:
+    except BookCopyRepositoryNoBookInfoError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND_CONFLICT, detail=f"Book title id {book_data.book_title_id} not found"
         ) from e
+
+@router.get("/", response_model=list[BookResponseScheme])
+async def get_books(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    book_copy_manager: Annotated[BookCopyManager, Depends()],
+    skip: int = 0,
+    limit: int = 100,
+):
+    books = await book_copy_manager.get_book_copies_with_details(db, skip, limit)
+    return books
+
+@router.get("/{book_id}", response_model=BookResponseScheme, responses={404: {"description": "Book is not found in database"}})
+async def get_book(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    book_copy_manager: Annotated[BookCopyManager, Depends()],
+    book_id: serial_number,
+):
+    book = await book_copy_manager.get_book_copy_with_details(db, book_id)
+    if book is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Boook not found",
+        )
+    return book
